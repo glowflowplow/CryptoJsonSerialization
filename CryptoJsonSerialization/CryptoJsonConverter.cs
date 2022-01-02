@@ -43,28 +43,7 @@ namespace CryptoJsonSerialization
                 if (reader.TokenType != JsonTokenType.StartObject)
                     throw new JsonException("Invalid TokenType");
 
-                var element = new CryptoElement();
-                while (reader.Read())
-                {
-                    if (reader.TokenType == JsonTokenType.EndObject) break;
-                    if (reader.TokenType != JsonTokenType.PropertyName) continue;
-
-                    string propName = reader.GetString();
-
-                    if (!reader.Read()) throw new JsonException();
-                    switch (propName)
-                    {
-                        case "Value":
-                            element.Value = reader.GetString();
-                            break;
-                        case "Type":
-                            element.Type = reader.GetString();
-                            break;
-                        case "Iv":
-                            element.Iv = reader.GetString();
-                            break;
-                    }
-                }
+                var element = readCryptoElement(ref reader);
 
                 if (typeToConvert.ToString() != element.Type) throw new JsonException();
 
@@ -109,25 +88,29 @@ namespace CryptoJsonSerialization
                 writer.WriteEndObject();
             }
 
-            private CryptoElement readCryptoElement(Utf8JsonReader reader)
+            private CryptoElement readCryptoElement(ref Utf8JsonReader reader)
             {
                 var element = new CryptoElement();
                 while (reader.Read())
                 {
-                    if (reader.TokenType == JsonTokenType.StartObject) continue;
                     if (reader.TokenType == JsonTokenType.EndObject) break;
-                    if (reader.TokenType != JsonTokenType.PropertyName)
+                    if (reader.TokenType != JsonTokenType.PropertyName) continue;
+
+                    string propName = reader.GetString();
+
+                    if (!reader.Read()) throw new JsonException();
+                    switch (propName)
                     {
-                        var propertyName = reader.GetString();
-                        reader.Read();
-                        if (propertyName == @"Value") element.Value = reader.GetString();
-                        if (propertyName == @"Type") element.Type = reader.GetString();
-                        if (propertyName == @"Iv") element.Iv = reader.GetString();
+                        case "Value":
+                            element.Value = reader.GetString();
+                            break;
+                        case "Type":
+                            element.Type = reader.GetString();
+                            break;
+                        case "Iv":
+                            element.Iv = reader.GetString();
+                            break;
                     }
-                }
-                if (element.Value == null || element.Type == null || element.Iv == null)
-                {
-                    throw new JsonException("Invalid ");
                 }
                 return element;
             }
