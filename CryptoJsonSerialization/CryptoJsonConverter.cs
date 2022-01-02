@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -64,7 +65,6 @@ namespace CryptoJsonSerialization
                             break;
                     }
                 }
-                //var element = readCryptoElement(reader);
 
                 if (typeToConvert.ToString() != element.Type) throw new JsonException();
 
@@ -72,7 +72,7 @@ namespace CryptoJsonSerialization
                 var decryptor = Aes.CreateDecryptor();
                 byte[] encryptedByteArrayValue = ByteArrayConverter.ToByteArray(element.Value);
                 string strValue = Encoding.UTF8.GetString(decryptor.TransformFinalBlock(encryptedByteArrayValue, 0, encryptedByteArrayValue.Length));
-                if (Utils.IsNumberType(typeToConvert))
+                if (IsNumberType(typeToConvert))
                     return (T)(object)decimal.Parse(strValue);
                 else if (typeToConvert == typeof(string))
                     return (T)(object)(strValue);
@@ -90,7 +90,6 @@ namespace CryptoJsonSerialization
                 element.Value = ByteArrayConverter.ToString(encryptor.TransformFinalBlock(byteValue, 0, byteValue.Length));
                 element.Iv = ByteArrayConverter.ToString(Aes.IV);
 
-                //writer.WriteObject(element);
                 writeCryptoElement(writer, element);
             }
 
@@ -132,6 +131,24 @@ namespace CryptoJsonSerialization
                 }
                 return element;
             }
+        }
+
+        public static bool IsNumberType(Type type)
+        {
+            var numTypes = new Type[] {
+                        typeof(byte),
+                        typeof(sbyte),
+                        typeof(short),
+                        typeof(ushort),
+                        typeof(int),
+                        typeof(uint),
+                        typeof(long),
+                        typeof(ulong),
+                        typeof(float),
+                        typeof(double),
+                        typeof(decimal)
+                    };
+            return numTypes.Contains(type);
         }
     }
 }

@@ -73,10 +73,7 @@
   <ItemGroup>
     <Compile Include="CryptoJsonConverter.cs" />
     <Compile Include="ByteArrayConverter.cs" />
-    <Compile Include="Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utf8JsonReaderExtentions.cs" />
-    <Compile Include="Utf8JsonWriterExtentions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
